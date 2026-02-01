@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(readlink:*)",
+      "Bash(xargs:*)",
+      "Bash(ln:*)",
+      "Bash(cat:*)",
+      "Bash(for file in double_pinyin.schema.yaml double_pinyin_abc.schema.yaml double_pinyin_flypy.schema.yaml double_pinyin_mspy.schema.yaml double_pinyin_sogou.schema.yaml double_pinyin_ziguang.schema.yaml melt_eng.dict.yaml melt_eng.schema.yaml radical_pinyin.dict.yaml radical_pinyin.schema.yaml)",
+      "Bash(do if [ -f \"$file\" ])",
+      "Bash([ ! -L \"$file\" ])",
+      "Bash(then echo \"$file - 可以替换\")",
+      "Bash(fi)",
+      "Bash(done)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
