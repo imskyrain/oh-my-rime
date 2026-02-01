@@ -10,7 +10,8 @@
       "Bash([ ! -L \"$file\" ])",
       "Bash(then echo \"$file - 可以替换\")",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []
