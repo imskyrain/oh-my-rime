@@ -1,0 +1,282 @@
+# Rime schema
+# encoding: utf-8
+
+# 小鹤双拼 + 雾凇拼音词库 完美组合
+# 基于雾凇拼音配置，适配小鹤双拼
+# 集成所有雾凇增强功能
+
+schema:
+  schema_id: double_pinyin_flypy_ice
+  name: 小鹤双拼·雾凇
+  version: "2026.02.02"
+  author:
+    - Dvel (雾凇拼音)
+    - Claude Code (双拼适配)
+  description: |
+    小鹤双拼 + 雾凇拼音词库
+    结合双拼效率与雾凇强大功能
+    https://github.com/iDvel/rime-ice
+  dependencies:
+    - melt_eng        # 英文输入
+    - radical_pinyin  # 部件拆字反查
+
+# 开关
+switches:
+  - name: ascii_mode
+    states: [ 中, Ａ ]
+  - name: ascii_punct
+    states: [ ¥, $ ]
+  - name: traditionalization
+    states: [ 简, 繁 ]
+  - name: emoji
+    states: [ 💀, 😄 ]
+    reset: 1
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: search_single_char
+    states: [正常, 单字]
+    abbrev: [词, 单]
+
+# 输入引擎
+engine:
+  processors:
+    - lua_processor@*select_character              # 以词定字
+    - lua_processor@*cold_word_drop.processor      # 生僻词降频
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - affix_segmentor@radical_lookup
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator
+    - lua_translator@*date_translator    # 时间、日期、星期
+    - lua_translator@*lunar              # 农历
+    - lua_translator@*uuid               # UUID
+    - table_translator@custom_phrase     # 自定义短语
+    - table_translator@melt_eng          # 英文输入
+    - table_translator@cn_en             # 中英混合词汇
+    - table_translator@radical_lookup    # 部件拆字反查
+    - lua_translator@*unicode            # Unicode
+    - lua_translator@*number_translator  # 数字、金额大写
+    - lua_translator@*calc_translator    # 计算器
+    - lua_translator@*force_gc           # 暴力 GC
+  filters:
+    - lua_filter@*corrector                         # 错音错字提示
+    - reverse_lookup_filter@radical_reverse_lookup  # 部件拆字滤镜
+    - lua_filter@*autocap_filter                    # 英文自动大写
+    - lua_filter@*v_filter                          # v 模式 symbols 优先
+    - lua_filter@*cn_en_spacer                      # 中英混输自动空格
+    - lua_filter@*is_in_user_dict                   # 用户词典标记
+    - lua_filter@*pin_cand_filter                   # 置顶候选项
+    - lua_filter@*long_word_filter                  # 长词优先
+    - lua_filter@*reduce_english_filter             # 降低部分英语单词
+    - lua_filter@*cold_word_drop.filter             # 生僻词降频
+    - simplifier@emoji                              # Emoji
+    - simplifier@traditionalize                     # 简繁切换
+    - lua_filter@*search@radical_pinyin             # 部件拆字辅码
+    - uniquifier                                    # 去重
+
+# Lua 配置
+date_translator:
+  date: rq
+  time: sj
+  week: xq
+  datetime: dt
+  timestamp: ts
+
+lunar: nl
+uuid: uuid
+
+long_word_filter:
+  count: 2
+  idx: 4
+
+reduce_english_filter:
+  mode: custom
+  idx: 2
+  words: [
+    aid, ann, bail, bait, bam, band, bans, bat, bay, bend, bent, benz,
+    cab, cad, cain, cam, cans, cap, cef, chad, chan, chap,
+    dab, dag, dal, dam, dent, dew, dial, diet, dim, din, dip
+  ]
+
+pin_cand_filter:
+  - d	的
+  - m	吗 嘛
+  - hm	后面
+
+is_in_user_dict: true
+
+# 主翻译器 - 使用雾凇词库
+translator:
+  dictionary: rime_ice
+  enable_word_completion: true
+  spelling_hints: 8
+  always_show_comments: true
+  initial_quality: 1.2
+  comment_format:
+    - xform/^/［/
+    - xform/$/］/
+  preedit_format:
+    # 小鹤双拼显示
+    - xform/([nl])v/$1ü/
+    - xform/([nl])ue/$1üe/
+    - xform/([jqxy])v/$1u/
+
+# 英文输入
+melt_eng:
+  dictionary: melt_eng
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 1.1
+  comment_format:
+    - xform/.*//
+
+# 中英混合词汇
+cn_en:
+  dictionary: ""
+  user_dict: en_dicts/cn_en
+  db_class: stabledb
+  enable_completion: true
+  enable_sentence: false
+  initial_quality: 0.5
+  comment_format:
+    - xform/^.+$//
+
+# 自定义短语
+custom_phrase:
+  dictionary: ""
+  user_dict: custom_phrase
+  db_class: stabledb
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 99
+
+# Emoji
+emoji:
+  option_name: emoji
+  opencc_config: emoji.json
+  inherit_comment: false
+
+# 简繁切换
+traditionalize:
+  option_name: traditionalization
+  opencc_config: s2t.json
+  tips: none
+  tags: [ abc, number, gregorian_to_lunar ]
+
+# 标点符号
+punctuator:
+  __include: default:/punctuator
+  full_shape:
+    __include: default:/punctuator/full_shape
+  half_shape:
+    __include: default:/punctuator/half_shape
+  symbols:
+    __include: symbols_v:/symbols
+
+# 部件拆字反查
+radical_lookup:
+  tag: radical_lookup
+  dictionary: radical_pinyin
+  enable_user_dict: false
+  prefix: "uU"
+  tips: "  〔拆字〕"
+  comment_format:
+    - erase/^.*$//
+
+radical_reverse_lookup:
+  tags: [ radical_lookup ]
+  dictionary: rime_ice
+
+# 识别器
+recognizer:
+  import_preset: default
+  patterns:
+    punct: "^v([0-9]|10|[A-Za-z]+)$"
+    radical_lookup: "^uU[a-z]+$"
+    unicode: "^U[a-f0-9]+"
+    number: "^R[0-9]+[.]?[0-9]*"
+    calculator: "^cC.+"
+    gregorian_to_lunar: "^N[0-9]{1,8}"
+
+# 快捷键
+key_binder:
+  import_preset: default
+  search: "`"
+
+# 编辑器
+editor:
+  bindings:
+    space: confirm
+    Return: commit_raw_input
+    Control+Return: commit_script_text
+    Control+Shift+Return: commit_comment
+    BackSpace: revert
+    Delete: delete
+    Control+BackSpace: back_syllable
+    Control+Delete: delete_candidate
+    Escape: cancel
+
+# 拼写设定 - 小鹤双拼
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA`
+  initials: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
+  delimiter: " '"
+  algebra:
+    # 音节修正合并
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - xform/^([aoe])(ng)?$/$1$1$2/
+    - xform/iu$/Q/
+    - xform/(.)ei$/$1W/
+    - xform/uan$/R/
+    - xform/[uv]e$/T/
+    - xform/un$/Y/
+    - xform/^sh/U/
+    - xform/^ch/I/
+    - xform/^zh/V/
+    - xform/uo$/O/
+    - xform/ie$/P/
+    - xform/i?ong$/S/
+    - xform/ing$|uai$/K/
+    - xform/(.)ai$/$1D/
+    - xform/(.)en$/$1F/
+    - xform/(.)eng$/$1G/
+    - xform/[iu]ang$/L/
+    - xform/(.)ang$/$1H/
+    - xform/ian$/M/
+    - xform/(.)an$/$1J/
+    - xform/(.)ou$/$1Z/
+    - xform/[iu]a$/X/
+    - xform/iao$/N/
+    - xform/(.)ao$/$1C/
+    - xform/ui$/V/
+    - xform/in$/B/
+    - xlit/QWRTYUIOPSDFGHJKLZXCVBNM/qwrtyuiopsdfghjklzxcvbnm/
+
+    # 超级简拼
+    - erase/^hm$/
+    - erase/^m$/
+    - erase/^n$/
+    - erase/^ng$/
+    - abbrev/^([a-z]).+$/$1/
+    - abbrev/^([zcs]h).+$/$1/
+
+    # 自动纠错
+    - derive/([dtngkhrzcs])o(u|ng)$/$1o/
+    - derive/ong$/on/
+    - derive/ao$/oa/
+    - derive/([iu])a(o|ng?)$/a$1$2/
