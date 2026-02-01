@@ -35,6 +35,7 @@ style:
   horizontal: false
   # # stacked | linear | tabled 候选项排列方向(如果希望水平，设置linear)
   # candidate_list_layout: stacked  # stacked | linear | tabled
+  candidate_list_layout: linear
   
   text_orientation: horizontal  # horizontal | vertical
   # 内嵌预编辑
