@@ -297,3 +297,10 @@ speller:
     - derive/ong$/on/
     - derive/ao$/oa/
     - derive/([iu])a(o|ng?)$/a$1$2/
+
+
+# 方案专属配色
+# 为雾凇双拼配置黑水鸭主题
+style:
+  color_scheme: mint_dark_blue
+  color_scheme_dark: mint_dark_blue

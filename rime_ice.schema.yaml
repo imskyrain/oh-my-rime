@@ -448,3 +448,10 @@ speller:
 # true：为输入过的词条加星号 *
 # false：为未输入过的词条加星号 *
 is_in_user_dict: true
+
+
+# 方案专属配色
+# 为雾凇拼音配置碧月青主题
+style:
+  color_scheme: mint_dark_green
+  color_scheme_dark: mint_dark_green
