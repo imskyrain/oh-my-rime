@@ -451,7 +451,7 @@ is_in_user_dict: true
 
 
 # 方案专属配色
-# 为雾凇拼音配置碧月青主题
+# 为雾凇拼音配置蓝水鸭主题
 style:
-  color_scheme: mint_dark_green
-  color_scheme_dark: mint_dark_green
+  color_scheme: mint_light_blue
+  color_scheme_dark: mint_dark_blue

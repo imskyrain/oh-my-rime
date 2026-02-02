@@ -422,7 +422,7 @@ key_binder:
 
 
 # 方案专属配色
-# 为薄荷拼音配置蓝水鸭主题
+# 为薄荷拼音配置碧月青主题
 style:
-  color_scheme: mint_light_blue
-  color_scheme_dark: mint_dark_blue
+  color_scheme: mint_dark_green
+  color_scheme_dark: mint_dark_green
