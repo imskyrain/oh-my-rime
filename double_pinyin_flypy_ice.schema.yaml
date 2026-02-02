@@ -4,6 +4,19 @@
 # 小鹤双拼 + 雾凇拼音词库 完美组合
 # 基于雾凇拼音配置，适配小鹤双拼
 # 集成所有雾凇增强功能
+#
+# ⚠️ 重要说明：
+# 本方案与 rime_ice（雾凇拼音全拼）共享词库数据，但使用独立的拼写索引。
+# 通过 translator.prism 参数避免与全拼方案的 prism 文件冲突。
+#
+# 技术细节：
+# - dictionary: rime_ice        → 使用雾凇词库数据（rime_ice.table.bin，约 58M）
+# - prism: double_pinyin_flypy_ice → 生成独立的双拼索引（double_pinyin_flypy_ice.prism.bin）
+#
+# 这样设计的好处：
+# ✅ 节省磁盘空间（不重复存储词库）
+# ✅ 加快编译速度（只需编译一次词库）
+# ✅ 避免 prism 文件冲突（全拼和双拼各自独立）
 
 schema:
   schema_id: double_pinyin_flypy_ice
@@ -119,8 +132,12 @@ pin_cand_filter:
 is_in_user_dict: true
 
 # 主翻译器 - 使用雾凇词库
+# ⚠️ 关键配置：prism 参数避免与全拼方案冲突
+# - dictionary: rime_ice               使用雾凇词典数据（与全拼方案共享 table.bin）
+# - prism: double_pinyin_flypy_ice     使用独立的拼写索引文件（避免覆盖全拼的 prism.bin）
 translator:
-  dictionary: rime_ice
+  dictionary: rime_ice                    # 词库数据来源
+  prism: double_pinyin_flypy_ice          # 拼写索引名称（必须与 schema_id 一致或独立命名）
   enable_word_completion: true
   spelling_hints: 8
   always_show_comments: true
